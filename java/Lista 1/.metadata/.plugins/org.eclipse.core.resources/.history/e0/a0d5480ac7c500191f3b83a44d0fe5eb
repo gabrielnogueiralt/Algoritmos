@@ -1,0 +1,78 @@
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in);
+		int m = in.nextInt();
+		String comando, expressao, temp = "", x = "", y = "";
+		Pilha pilha = new Pilha();
+		
+		for(int i = 0; i < m; i++) {
+			comando = in.next();
+			if (comando.equals("VAL")) {
+				expressao = in.next();
+				for(int j = 0; j < expressao.length();j++) {
+					if(expressao.charAt(j) == '0' || expressao.charAt(j) == '1') {
+						temp = Character.toString(expressao.charAt(j));
+						pilha.empilhar(temp);
+					} else if (expressao.charAt(j) == '~') {
+						temp = pilha.desempilhar();
+						if(temp.equals("0")) {
+							temp = "1";
+						} else {
+							temp = "0";
+						}
+						pilha.empilhar(temp);
+						
+					} else if (expressao.charAt(j) == '^') {
+						x = pilha.desempilhar();
+						y = pilha.desempilhar();
+						if (x.equals("1") && y.equals("1"){
+							pilha.empilhar("1");
+						} else {
+							pilha.empilhar("0");
+						}
+					} else if (expressao.charAt(j) == 'v') {
+						
+					} else if (expressao.charAt(j) == '>') {
+						
+					}
+				}
+				
+			} else {
+				expressao = in.next();
+			}
+		}
+	}
+
+}
+class Pilha {
+	public String[] pilha;
+	public int posicao;
+	
+	public Pilha() {
+		this.posicao = -1;
+		this.pilha = new String[1000];
+	}
+	
+	public boolean pilhaVazia() {
+		if(this.posicao == -1) {
+			return true;
+		}
+		return false;
+	}
+	
+	public String desempilhar() {
+		if(this.pilhaVazia()) {
+			return null;
+		}
+		return this.pilha[this.posicao--];
+	}
+	
+	public void empilhar(String valor) {
+		if(this.posicao < this.pilha.length - 1) {
+			this.pilha[++posicao] = valor;
+		}
+	}
+}

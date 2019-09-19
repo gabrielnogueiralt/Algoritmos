@@ -1,0 +1,21 @@
+import java.util.Scanner;
+
+public class questao {
+
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in);
+		int m = in.nextInt();
+		String comando, expressao;
+		
+		for(int i = 0; i < m; i++) {
+			comando = in.next();
+			if (comando.equals("VAL")) {
+				expressao = in.next();
+				System.out.println(expressao);
+			} else {
+				expressao = in.next();
+			}
+		}
+	}
+
+}
