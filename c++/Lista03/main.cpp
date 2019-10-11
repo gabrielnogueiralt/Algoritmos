@@ -36,7 +36,7 @@ bool vector<T>::full() {
 
 template<class T>
 void vector<T>::change() {
-    int newSize = this->Rsize << 1;
+    int newSize = 2*this->Rsize;
     newSize++;
 
     T *aux = new T[newSize];
@@ -55,6 +55,10 @@ vector<T>::vector() {
     this->vet = nullptr;
     this->logic = 0;
     this->Rsize = 0;
+}
+template <class T>
+vector<T>::insert(int n, T val) {
+    for (int i = 0; i < n; i++) this->push_back (val);
 }
 
 template<class T>
@@ -97,12 +101,12 @@ T &vector<T>::operator[](int index) {
 class Node {
 private:
     int caste;
-    vector<int> agent;
+    vector<int> * agent;
     Node *left, *right;
 public:
     Node(int caste) {
         this->caste = caste;
-        this->agent = agent;
+        this->agent = new vector<int>;
         this->left = NULL;
         this->right = NULL;
     }
@@ -111,7 +115,7 @@ public:
         return caste;
     }
 
-    vector<int> getAgent() {
+    vector<int> * getAgent() {
         return agent;
     }
 
@@ -166,6 +170,33 @@ public:
         }
 
     }
+
+    void insertAdm(int caste, int id, int base, int height) {
+        if (root == NULL)
+            root = new Node(caste);
+        else
+            insertAuxAdm(root, caste, id, base, height);
+    }
+
+    void insertAuxAdm(Node *node, int caste, int id, int base, int height) {
+        if (caste < node->getCaste()) {
+            if (node->getLeft() == NULL) {
+                if(this->height() < )
+                Node *newNode = new Node(caste);
+                node->setLeft(newNode);
+            } else {
+                insertAuxAdm(node->getLeft(), caste, id, base, height);
+            }
+        } else if (caste > node->getCaste()) {
+            if (node->getRight() == NULL) {
+                Node *newNode = new Node(caste);
+                node->setRight(newNode);
+            } else {
+                insertAuxAdm(node->getRight(), caste, id, base, height);
+            }
+        }
+
+    }
 public:
     int height(){
         return height(this->root);
@@ -185,7 +216,6 @@ private:
                 return heightLeft;
             else
                 return heightRight;
-
         }
     }
 
@@ -207,6 +237,7 @@ int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
 
+    Tree tree;
     int n, h, f, c, id, b;
     string adm;
     cin >> n >> h >> f;
@@ -214,6 +245,18 @@ int main() {
         cin >> adm;
         if(adm != "END") {
             cin >> c >> id >> b;
+        }
+        if(adm == "ADM"){
+            tree.insertAdm(c,id,b,h);
+        }
+        if(adm == "INF"){
+            tree.insert(c,id,b,h);
+        }
+        if(adm == "EXT"){
+
+        }
+        if(adm == "SCH"){
+
         }
     }
 
