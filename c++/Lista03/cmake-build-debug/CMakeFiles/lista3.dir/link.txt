@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/lista3.dir/main.cpp.o  -o lista3 

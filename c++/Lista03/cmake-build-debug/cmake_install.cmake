@@ -1,4 +1,4 @@
-# Install script for directory: /home/gabrielnogueira/CLionProjects/lista3
+# Install script for directory: /home/gabrielnogueira/Documents/Algoritmos/c++/Lista03
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/gabrielnogueira/CLionProjects/lista3/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/gabrielnogueira/Documents/Algoritmos/c++/Lista03/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

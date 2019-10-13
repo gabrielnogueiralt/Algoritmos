@@ -2,111 +2,76 @@
 
 using namespace std;
 
-template<class T>
-class vector {
-private:
-    T *vet;
-    int logic;
-    int Rsize;
-
-    bool full();
-
-    void change();
-
-public:
-    vector();
-
-    ~vector();
-
-    bool empty();
-
-    void push_back(T val);
-
-    void pop_back();
-
-    int size();
-
-    T &operator[](int index);
+struct NodeList {
+    int id;
+    NodeList *next;
 };
 
-template<class T>
-bool vector<T>::full() {
-    return (this->logic == this->Rsize);
-}
-
-template<class T>
-void vector<T>::change() {
-    int newSize = 2*this->Rsize;
-    newSize++;
-
-    T *aux = new T[newSize];
-
-    for (int i = 0; i < this->logic; i++) aux[i] = this->vet[i];
-
-
-    delete[] this->vet;
-
-    this->vet = aux;
-    this->Rsize = newSize;
-}
-
-template<class T>
-vector<T>::vector() {
-    this->vet = nullptr;
-    this->logic = 0;
-    this->Rsize = 0;
-}
-template <class T>
-vector<T>::insert(int n, T val) {
-    for (int i = 0; i < n; i++) this->push_back (val);
-}
-
-template<class T>
-vector<T>::~vector() {
-    delete[] this->vet;
-    this->logic = 0;
-    this->Rsize = 0;
-}
-
-template<class T>
-bool vector<T>::empty() {
-    return (this->logic == 0);
-}
-
-template<class T>
-void vector<T>::push_back(T val) {
-    if (this->full()) {
-        this->change();
+class List {
+private:
+    NodeList *head, *tail;
+public:
+    List() {
+        head = NULL;
+        tail = NULL;
     }
 
-    this->vet[this->logic] = val;
-    this->logic++;
-}
+    void createNode(int id) {
+        NodeList *temp = new NodeList;
+        temp->id = id;
+        temp->next = NULL;
+        if (head == NULL) {
+            head = temp;
+            tail = temp;
+            temp = NULL;
+        } else {
+            tail->next = temp;
+            tail = temp;
+        }
+    }
 
-template<class T>
-void vector<T>::pop_back() {
-    this->logic--;
-}
+    int search(int id, int pos) {
+        NodeList *current = head;
+        while (current != NULL) {
+            if (current->id == id)
+                return pos;
+            pos++;
+            current = current->next;
+        }
+        return -1;
+    }
 
-template<class T>
-int vector<T>::size() {
-    return (this->logic);
-}
+    void deleteNode(int pos) {
+        NodeList *current = new NodeList;
+        NodeList *previous = new NodeList;
+        current = head;
+        for (int i = 0; i < pos; i++) {
+            previous = current;
+            current = current->next;
+        }
+        previous->next = current->next;
+    }
 
-template<class T>
-T &vector<T>::operator[](int index) {
-    return this->vet[index];
-}
+    int size() {
+        int count = 0;
+        NodeList *current = head;
+        while (current != NULL) {
+            count++;
+            current = current->next;
+        }
+        return count;
+    }
+};
 
 class Node {
 private:
     int caste;
-    vector<int> * agent;
+    List *agent;
     Node *left, *right;
 public:
     Node(int caste) {
         this->caste = caste;
-        this->agent = new vector<int>;
+        this->agent = new List;
         this->left = NULL;
         this->right = NULL;
     }
@@ -115,7 +80,7 @@ public:
         return caste;
     }
 
-    vector<int> * getAgent() {
+    List *getAgent() {
         return agent;
     }
 
@@ -145,77 +110,212 @@ public:
         root = NULL;
     }
 
-    void insert(int caste) {
-        if (root == NULL)
-            root = new Node(caste);
-        else
-            insertAux(root, caste);
+    int insert(int caste, int id, int height, int base) {
+        if (this->height() <= height) {
+            if (root == NULL) {
+                root = new Node(caste);
+                root->getAgent()->createNode(id);
+                cout << base << endl;
+                return -3;
+            } else
+                return insertAux(root, caste, id, base, height);
+        } else {
+            return -2;
+        }
     }
 
-    void insertAux(Node *node, int caste) {
+    int insertAux(Node *node, int caste, int id, int base, int height) {
         if (caste < node->getCaste()) {
             if (node->getLeft() == NULL) {
-                Node *newNode = new Node(caste);
-                node->setLeft(newNode);
-            } else {
-                insertAux(node->getLeft(), caste);
-            }
+                if (this->height() < height) {
+                    Node *newNode = new Node(caste);
+                    newNode->getAgent()->createNode(id);
+                    node->setLeft(newNode);
+                    cout << base << endl;
+                    return -3;
+                } else {
+                    return -2;
+                }
+            } else
+                return insertAux(node->getLeft(), caste, id, base, height);
         } else if (caste > node->getCaste()) {
             if (node->getRight() == NULL) {
-                Node *newNode = new Node(caste);
-                node->setRight(newNode);
+                if (this->height() < height) {
+                    Node *newNode = new Node(caste);
+                    newNode->getAgent()->createNode(id);
+                    node->setRight(newNode);
+                    cout << base << endl;
+                    return -3;
+                } else {
+                    return -2;
+                }
+
             } else {
-                insertAux(node->getRight(), caste);
+                return insertAux(node->getRight(), caste, id, base, height);
             }
+        } else {
+            node->getAgent()->createNode(id);
+            cout << base << endl;
+            return -3;
         }
 
     }
 
-    void insertAdm(int caste, int id, int base, int height) {
-        if (root == NULL)
-            root = new Node(caste);
-        else
-            insertAuxAdm(root, caste, id, base, height);
+    string insertADM(int caste, int id, int height, int base) {
+        if (this->height() <= height) {
+            if (root == NULL) {
+                root = new Node(caste);
+                root->getAgent()->createNode(id);
+                return "alocated";
+            } else
+                return insertAuxADM(root, caste, id, base, height);
+        } else {
+            return "full";
+        }
     }
 
-    void insertAuxAdm(Node *node, int caste, int id, int base, int height) {
+    string insertAuxADM(Node *node, int caste, int id, int base, int height) {
         if (caste < node->getCaste()) {
             if (node->getLeft() == NULL) {
-                if(this->height() < )
-                Node *newNode = new Node(caste);
-                node->setLeft(newNode);
-            } else {
-                insertAuxAdm(node->getLeft(), caste, id, base, height);
-            }
+                if (this->height() < height) {
+                    Node *newNode = new Node(caste);
+                    newNode->getAgent()->createNode(id);
+                    node->setLeft(newNode);
+                    return "alocated";
+                } else {
+                    return "full";
+                }
+
+            } else
+                return insertAuxADM(node->getLeft(), caste, id, base, height);
         } else if (caste > node->getCaste()) {
             if (node->getRight() == NULL) {
-                Node *newNode = new Node(caste);
-                node->setRight(newNode);
+                if (this->height() < height) {
+                    Node *newNode = new Node(caste);
+                    newNode->getAgent()->createNode(id);
+                    node->setRight(newNode);
+                    return "alocated";
+                } else {
+                    return "full";
+                }
+
             } else {
-                insertAuxAdm(node->getRight(), caste, id, base, height);
+                return insertAuxADM(node->getRight(), caste, id, base, height);
             }
+        } else {
+            node->getAgent()->createNode(id);
+            return "alocated";
         }
 
     }
+
+    int search(int caste, int id, int base, int j) {
+        if (root == NULL) {
+            return -1;
+        } else if (root->getCaste() == caste) {
+            if (root->getAgent()->search(id, 0) != -1) {
+                return 1;
+            }
+
+        }
+        return searchAux(root, caste, id, base, j);
+    }
+
+    int searchAux(Node *node, int caste, int id, int base, int j) {
+        if (caste < node->getCaste()) {
+            if (node->getLeft() == NULL) {
+                return -1;
+            } else {
+                j++;
+                return searchAux(node->getLeft(), caste, id, base, j);
+            }
+
+        } else if (caste > node->getCaste()) {
+            if (node->getRight() == NULL) {
+                return -1;
+            } else
+                j++;
+            return searchAux(node->getRight(), caste, id, base, j);
+        } else {
+            if (node->getAgent()->search(id, 0) != -1) {
+                return j;
+            }
+            return -1;
+        }
+    }
+
+    int ext(int caste, int id, int base) {
+        if (this->search(caste, id, base, 1) != -1) {
+            if (root->getCaste() == caste) {
+                int pos = root->getAgent()->search(id, 0);
+                root->getAgent()->deleteNode(pos);
+                if (root->getAgent()->size() == 0) {
+                    root = NULL;
+                }
+                return 1;
+            } else {
+                return extAux(root, caste, id, base);
+            }
+        }
+        return -1;
+
+    }
+
+    int extAux(Node *node, int caste, int id, int base) {
+        if (caste < node->getCaste()) {
+            if (node->getLeft() == NULL) {
+                return -1;
+            } else
+                return extAux(node->getLeft(), caste, id, base);
+        } else if (caste > node->getCaste()) {
+            if (node->getRight() == NULL) {
+                return -1;
+            } else {
+                return extAux(node->getRight(), caste, id, base);
+            }
+        } else {
+            int pos = node->getAgent()->search(id, 0);
+            node->getAgent()->deleteNode(pos);
+            if (node->getAgent()->size() == 0) {
+                this->realocate(caste);
+            }
+            return 1;
+        }
+    }
+
+    void realocate(int caste) {
+        if(root->getLeft() == NULL){
+            int v = root->getCaste()
+        }
+    }
+
+    void realocateAux(int caste, Node* node){
+        if (caste < node->getCaste()) {
+            return realocateAux(caste, node->getLeft());
+            }
+        else if (caste > node->getCaste()) {
+            return realocateAux(caste, node->getRight());
+        } else {
+
+        }
+    }
+
 public:
-    int height(){
+    int height() {
         return height(this->root);
     }
+
 private:
     int height(Node *node) {
-        if (node == NULL) {
+        if (node == NULL)
             return 0;
-        } else {
-            int heightLeft = 0, heightRight = 0;
-            heightLeft = height(node->getLeft());
-            heightLeft++;
-            heightRight = height(node->getRight());
-            heightRight++;
+        else {
+            int lDepth = height(node->getLeft());
+            int rDepth = height(node->getRight());
 
-            if (heightLeft > heightRight)
-                return heightLeft;
-            else
-                return heightRight;
+            if (lDepth > rDepth)
+                return (lDepth + 1);
+            else return (rDepth + 1);
         }
     }
 
@@ -237,26 +337,52 @@ int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
 
-    Tree tree;
-    int n, h, f, c, id, b;
-    string adm;
+    int n = 0, h = 0, f = 0, c = 0, id = 0, b = 0, counter = 0, answerINF = 0, count = 0, i = 0, j = 0, answerSCH = 0;
+    string adm = "", answerADM = "";
     cin >> n >> h >> f;
-    while(adm != "END"){
+    Tree tree[n];
+    while (adm != "END") {
         cin >> adm;
-        if(adm != "END") {
+        if (adm != "END") {
             cin >> c >> id >> b;
         }
-        if(adm == "ADM"){
-            tree.insertAdm(c,id,b,h);
-        }
-        if(adm == "INF"){
-            tree.insert(c,id,b,h);
-        }
-        if(adm == "EXT"){
+        if (adm == "ADM") {
+            answerADM = tree[b].insertADM(c, id, h, b);
+            if (answerADM != "alocated") {
+                i = b + 1;
+                while (answerADM != "allFull" || answerADM != "alocated") {
+                    if (answerADM == "full") {
+                        answerADM = tree[i].insertADM(c, id, h, i);
+                        counter++;
+                    } else if (counter >= n - 1) {
+                        answerADM = "allFull";
+                    }
+                    i++;
+                }
+            }
 
         }
-        if(adm == "SCH"){
-
+        if (adm == "INF") {
+            answerINF = tree[b].insert(c, id, h, b);
+            if (answerINF != -3) {
+                i = b + 1;
+                while (answerINF != -4 || answerINF != -3) {
+                    if (answerINF == -2) {
+                        answerINF = tree[i].insert(c, id, h, i);
+                        counter++;
+                    } else if (counter >= n - 1) {
+                        answerINF = -4;
+                    }
+                    i++;
+                }
+            }
+        }
+        if (adm == "EXT") {
+            tree[b].ext(c, id, b);
+        }
+        if (adm == "SCH") {
+            answerSCH = tree[b].search(c, id, b, j);
+            cout << answerSCH << endl;
         }
     }
 
