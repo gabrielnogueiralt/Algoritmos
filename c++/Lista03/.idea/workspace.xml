@@ -13,13 +13,7 @@
   <component name="ChangeListManager">
     <list default="true" id="52852ad4-069f-41e2-8ab1-f574a6f35425" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-environment.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-environment.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/cmake_install.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/cmake_install.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/lista3" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/lista3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/lista3.cbp" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/lista3.cbp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -80,6 +74,9 @@
       <workItem from="1570881134630" duration="13385000" />
       <workItem from="1570916633045" duration="17554000" />
       <workItem from="1570938491241" duration="1240000" />
+      <workItem from="1570971063590" duration="2861000" />
+      <workItem from="1570975279725" duration="1011000" />
+      <workItem from="1570996332835" duration="13789000" />
     </task>
     <servers />
   </component>
@@ -104,8 +101,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>365</line>
-          <option name="timeStamp" value="9" />
+          <line>393</line>
+          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

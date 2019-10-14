@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
@@ -63,312 +64,321 @@ public:
     }
 };
 
-class Node {
-private:
-    int caste;
+class No {
+public :
+    int valor;
+    No *direito, *esquerdo;
     List *agent;
-    Node *left, *right;
+
+    No();
+
+    No(int);
+};
+
+No::No() {
+    this->direito = this->esquerdo = NULL;
+    this->agent = new List;
+}
+
+No::No(int valor) {
+    this->valor = valor;
+    this->direito = this->esquerdo = NULL;
+    this->agent = new List;
+}
+
+class ArvoreBinaria {
+protected :
+    No *raiz;
+
+    int buscar(No *, int, int);
+
+    int remover(No *, int, int , int);
+
+    int altura(No *);
+
+    int level(No *, int, int);
+
 public:
-    Node(int caste) {
-        this->caste = caste;
-        this->agent = new List;
-        this->left = NULL;
-        this->right = NULL;
-    }
+    ArvoreBinaria();
 
-    int getCaste() {
-        return caste;
-    }
+    int altura();
 
-    List *getAgent() {
-        return agent;
-    }
+    int level(int);
 
-    Node *getLeft() {
-        return left;
-    }
+    bool vazio();
 
-    Node *getRight() {
-        return right;
-    }
+    int buscar(int, int);
 
-    void setLeft(Node *node) {
-        left = node;
-    }
+    int insere(int, int , int, int);
 
-    void setRight(Node *node) {
-        right = node;
-    }
+    int insereADM(int, int , int, int);
+
+    int remover(int, int , int);
+
+    No *noMaior(No *);
 
 };
 
-class Tree {
-private:
-    Node *root;
-public:
-    Tree() {
-        root = NULL;
-    }
+No *ArvoreBinaria::noMaior(No *raiz) {
+    No *temp = NULL;
 
-    int insert(int caste, int id, int height, int base) {
-        if (this->height() <= height) {
-            if (root == NULL) {
-                root = new Node(caste);
-                root->getAgent()->createNode(id);
+    temp = raiz;
+
+    if (temp->direito == NULL) {
+        raiz = raiz->esquerdo;
+        return temp;
+    } else
+        return noMaior(raiz->direito);
+}
+
+int ArvoreBinaria::level(No *inicio, int valor, int nivel) {
+    if (!inicio)
+        return -1;
+    else {
+        if (valor == inicio->valor)
+            return nivel;
+        else {
+            ++nivel;
+
+            if (valor < inicio->valor)
+                nivel = level(inicio->esquerdo, valor, nivel);
+            else if (valor > inicio->valor)
+                nivel = level(inicio->direito, valor, nivel);
+        }
+
+        return nivel;
+    }
+}
+
+
+int ArvoreBinaria::level(int valor) {
+    return level(this->raiz, valor, 0);
+}
+
+int ArvoreBinaria::altura(No *inicio) {
+    if (!inicio)
+        return -1;
+    else {
+        int alturaesquerda = 0, alturadireita = 0;
+        alturaesquerda = altura(inicio->esquerdo);
+        alturadireita = altura(inicio->direito);
+
+        if (alturaesquerda < alturadireita)
+            return alturadireita + 1;
+        else
+            return alturaesquerda + 1;
+    }
+}
+
+int ArvoreBinaria::altura() {
+    return altura(this->raiz) + 1;
+}
+
+int ArvoreBinaria::buscar(No* inicio, int valor, int id) {
+    while (inicio != NULL) {
+        if (valor == inicio->valor){
+            if (inicio->agent->search(id, 0) != -1) {
+                return this->level(this->raiz, valor, 0);
+            } else {
+                return -1;
+            }
+        }
+        else if (valor < inicio->valor) {
+            if (inicio->esquerdo == NULL) {
+                return -1;
+            } else {
+                inicio = inicio->esquerdo;
+            }
+
+        } else{
+            if (inicio->direito == NULL) {
+                return -1;
+            } else {
+                inicio = inicio->direito;
+            }
+
+        }
+
+    }
+    return -1;
+}
+
+ArvoreBinaria::ArvoreBinaria() {
+    this->raiz = NULL;
+}
+
+bool ArvoreBinaria::vazio() {
+    return this->raiz == NULL;
+}
+
+int ArvoreBinaria::insere(int valor, int id, int altura, int base) {
+    if(this->altura() <= altura){
+        No *tmp = this->raiz;
+        No *ant = NULL;
+
+        while (tmp != NULL) {
+            ant = tmp;
+
+            if (tmp->valor < valor) {
+                tmp = tmp->direito;
+            } else if (tmp->valor > valor){
+                tmp = tmp->esquerdo;
+            } else {
+                tmp->agent->createNode(id);
                 cout << base << endl;
                 return -3;
-            } else
-                return insertAux(root, caste, id, base, height);
-        } else {
-            return -2;
+            }
         }
-    }
 
-    int insertAux(Node *node, int caste, int id, int base, int height) {
-        if (caste < node->getCaste()) {
-            if (node->getLeft() == NULL) {
-                if (this->height() < height) {
-                    Node *newNode = new Node(caste);
-                    newNode->getAgent()->createNode(id);
-                    node->setLeft(newNode);
-                    cout << base << endl;
-                    return -3;
-                } else {
-                    return -2;
-                }
-            } else
-                return insertAux(node->getLeft(), caste, id, base, height);
-        } else if (caste > node->getCaste()) {
-            if (node->getRight() == NULL) {
-                if (this->height() < height) {
-                    Node *newNode = new Node(caste);
-                    newNode->getAgent()->createNode(id);
-                    node->setRight(newNode);
-                    cout << base << endl;
-                    return -3;
-                } else {
-                    return -2;
-                }
-
+        if (this->vazio()) {
+            if(this->altura() < altura) {
+                this->raiz = new No(valor);
+                this->raiz->agent->createNode(id);
+                cout << base << endl;
+                return -3;
             } else {
-                return insertAux(node->getRight(), caste, id, base, height);
+                return -2;
             }
-        } else {
-            node->getAgent()->createNode(id);
-            cout << base << endl;
-            return -3;
-        }
-
-    }
-
-    string insertADM(int caste, int id, int height, int base) {
-        if (this->height() <= height) {
-            if (root == NULL) {
-                root = new Node(caste);
-                root->getAgent()->createNode(id);
-                return "alocated";
-            } else
-                return insertAuxADM(root, caste, id, base, height);
-        } else {
-            return "full";
-        }
-    }
-
-    string insertAuxADM(Node *node, int caste, int id, int base, int height) {
-        if (caste < node->getCaste()) {
-            if (node->getLeft() == NULL) {
-                if (this->height() < height) {
-                    Node *newNode = new Node(caste);
-                    newNode->getAgent()->createNode(id);
-                    node->setLeft(newNode);
-                    return "alocated";
-                } else {
-                    return "full";
-                }
-
-            } else
-                return insertAuxADM(node->getLeft(), caste, id, base, height);
-        } else if (caste > node->getCaste()) {
-            if (node->getRight() == NULL) {
-                if (this->height() < height) {
-                    Node *newNode = new Node(caste);
-                    newNode->getAgent()->createNode(id);
-                    node->setRight(newNode);
-                    return "alocated";
-                } else {
-                    return "full";
-                }
-
+        } else if (ant->valor < valor) {
+            if(this->altura() < altura) {
+                ant->direito = new No(valor);
+                ant->direito->agent->createNode(id);
+                cout << base << endl;
+                return -3;
             } else {
-                return insertAuxADM(node->getRight(), caste, id, base, height);
+                return -2;
             }
         } else {
-            node->getAgent()->createNode(id);
-            return "alocated";
-        }
-
-    }
-
-    int search(int caste, int id, int base, int j) {
-        if (root == NULL) {
-            return -1;
-        } else if (root->getCaste() == caste) {
-            if (root->getAgent()->search(id, 0) != -1) {
-                return 1;
-            }
-
-        }
-        return searchAux(root, caste, id, base, j);
-    }
-
-    int searchAux(Node *node, int caste, int id, int base, int j) {
-        if (caste < node->getCaste()) {
-            if (node->getLeft() == NULL) {
-                return -1;
+            if(this->altura() < altura) {
+                ant->esquerdo = new No(valor);
+                ant->esquerdo->agent->createNode(id);
+                cout << base << endl;
+                return -3;
             } else {
-                j++;
-                return searchAux(node->getLeft(), caste, id, base, j);
+                return -2;
             }
-
-        } else if (caste > node->getCaste()) {
-            if (node->getRight() == NULL) {
-                return -1;
-            } else
-                j++;
-            return searchAux(node->getRight(), caste, id, base, j);
-        } else {
-            if (node->getAgent()->search(id, 0) != -1) {
-                return j;
-            }
-            return -1;
         }
     }
+    return -2;
+}
 
-    int ext(int caste, int id, int base) {
-        if (this->search(caste, id, base, 1) != -1) {
-            if (root->getCaste() == caste) {
-                int pos = root->getAgent()->search(id, 0);
-                root->getAgent()->deleteNode(pos);
-                if (root->getAgent()->size() == 0) {
-                    root = NULL;
-                }
-                return 1;
+int ArvoreBinaria::insereADM(int valor, int id, int altura, int base) {
+    if(this->altura() <= altura){
+        No *tmp = this->raiz;
+        No *ant = NULL;
+
+        while (tmp != NULL) {
+            ant = tmp;
+
+            if (tmp->valor < valor) {
+                tmp = tmp->direito;
+            } else if (tmp->valor > valor){
+                tmp = tmp->esquerdo;
             } else {
-                return extAux(root, caste, id, base);
+                tmp->agent->createNode(id);
+                return -3;
             }
         }
-        return -1;
 
-    }
-
-    int extAux(Node *node, int caste, int id, int base) {
-        if (caste < node->getCaste()) {
-            if (node->getLeft() == NULL) {
-                return -1;
-            } else
-                return extAux(node->getLeft(), caste, id, base);
-        } else if (caste > node->getCaste()) {
-            if (node->getRight() == NULL) {
-                return -1;
+        if (this->vazio()) {
+            if(this->altura() < altura) {
+                this->raiz = new No(valor);
+                this->raiz->agent->createNode(id);
+                return -3;
             } else {
-                return extAux(node->getRight(), caste, id, base);
+                return -2;
+            }
+        } else if (ant->valor < valor) {
+            if(this->altura() < altura) {
+                ant->direito = new No(valor);
+                ant->direito->agent->createNode(id);
+                return -3;
+            } else {
+                return -2;
             }
         } else {
-            int pos = node->getAgent()->search(id, 0);
-            node->getAgent()->deleteNode(pos);
-            if (node->getAgent()->size() == 0) {
-                this->realocate(caste);
+            if(this->altura() < altura) {
+                ant->esquerdo = new No(valor);
+                ant->esquerdo->agent->createNode(id);
+                return -3;
+            } else {
+                return -2;
             }
-            return 1;
         }
     }
+    return -2;
+}
 
-    void realocate(int caste) {
-        if(root->getLeft() == NULL){
-            int v = root->getCaste()
-        }
-    }
+int ArvoreBinaria::remover(No *raiz, int valor, int id, int base) {
+    No *temp = NULL;
 
-    void realocateAux(int caste, Node* node){
-        if (caste < node->getCaste()) {
-            return realocateAux(caste, node->getLeft());
-            }
-        else if (caste > node->getCaste()) {
-            return realocateAux(caste, node->getRight());
-        } else {
-
-        }
-    }
-
-public:
-    int height() {
-        return height(this->root);
-    }
-
-private:
-    int height(Node *node) {
-        if (node == NULL)
-            return 0;
+    if (raiz == NULL)
+        return 1;
+    if (valor == raiz->valor) {
+        temp = raiz;
+        if (raiz->esquerdo == NULL)
+            raiz = raiz->direito;
+        else if (raiz->direito == NULL)
+            raiz = raiz->esquerdo;
         else {
-            int lDepth = height(node->getLeft());
-            int rDepth = height(node->getRight());
-
-            if (lDepth > rDepth)
-                return (lDepth + 1);
-            else return (rDepth + 1);
+            temp = noMaior(raiz->esquerdo);
+            raiz->valor = temp->valor;
         }
-    }
+        delete temp;
+        return 0;
+    } else if (valor < raiz->valor)
+        return remover(raiz->esquerdo, valor, id, base);
+    else
+        return remover(raiz->direito, valor, id, base);
+}
 
-    Node *getRoot() {
-        return root;
-    }
+int ArvoreBinaria::remover(int valor, int id, int base) {
+    return remover(this->raiz, valor, id, base);
+}
 
-//    void inOrder(Node* node){
-//        if(node != NULL){
-//            inOrder(node->getLeft());
-//            cout << node->getCaste() << " ";
-//            inOrder(node->getRight());
-//        }
-//    }
-};
+int ArvoreBinaria::buscar(int valor, int id) {
+    return buscar(this->raiz, valor, id);
+}
 
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
 
-    int n = 0, h = 0, f = 0, c = 0, id = 0, b = 0, counter = 0, answerINF = 0, count = 0, i = 0, j = 0, answerSCH = 0;
-    string adm = "", answerADM = "";
+    int n = 0, h = 0, f = 0, c = 0, id = 0, b = 0, counter = 0,answerADM = 0, answerINF = 0, count = 0, i = 0, j = 0, answerSCH = 0;
+    string input = "";
     cin >> n >> h >> f;
-    Tree tree[n];
-    while (adm != "END") {
-        cin >> adm;
-        if (adm != "END") {
+    ArvoreBinaria tree[n];
+    while (input != "END") {
+        cin >> input;
+        if (input != "END") {
             cin >> c >> id >> b;
         }
-        if (adm == "ADM") {
-            answerADM = tree[b].insertADM(c, id, h, b);
-            if (answerADM != "alocated") {
-                i = b + 1;
-                while (answerADM != "allFull" || answerADM != "alocated") {
-                    if (answerADM == "full") {
-                        answerADM = tree[i].insertADM(c, id, h, i);
+        if (input == "ADM") {
+            answerADM = tree[b].insereADM(c, id, h, b);
+            if (answerADM != -3) {
+                i = (b + 1) % n;
+                while (answerADM != 1 && answerADM != -3) {
+                    if (answerADM == -2) {
+                        answerADM = tree[i].insereADM(c, id, h, i);
                         counter++;
-                    } else if (counter >= n - 1) {
-                        answerADM = "allFull";
                     }
-                    i++;
+                    if (counter >= n - 1) {
+                        answerADM = 1;
+                    }
+                    i = (i + 1) % n;
                 }
+                counter = 0;
             }
 
         }
-        if (adm == "INF") {
-            answerINF = tree[b].insert(c, id, h, b);
+        if (input == "INF") {
+            answerINF = tree[b].insere(c, id, h, b);
             if (answerINF != -3) {
-                i = b + 1;
+                i = (b + 1) % n;
                 while (answerINF != -4 || answerINF != -3) {
                     if (answerINF == -2) {
-                        answerINF = tree[i].insert(c, id, h, i);
+                        answerINF = tree[i].insere(c, id, h, i);
                         counter++;
                     } else if (counter >= n - 1) {
                         answerINF = -4;
@@ -377,11 +387,11 @@ int main() {
                 }
             }
         }
-        if (adm == "EXT") {
-            tree[b].ext(c, id, b);
+        if (input == "EXT") {
+            tree[b].remover(c, id, b);
         }
-        if (adm == "SCH") {
-            answerSCH = tree[b].search(c, id, b, j);
+        if (input == "SCH") {
+            answerSCH = tree[b].buscar(c, id);
             cout << answerSCH << endl;
         }
     }
