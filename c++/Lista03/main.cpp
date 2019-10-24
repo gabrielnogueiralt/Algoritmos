@@ -3,30 +3,33 @@
 using namespace std;
 
 struct NodeList {
-    int id;
+    int *id;
     NodeList *next;
+    NodeList (int id) {
+        *(this->id) = id;
+        this->next = NULL;
+    }
+    NodeList () {
+        this->id = nullptr;
+        this->next = nullptr;
+    }
 };
 
 class List {
-private:
-    NodeList *head, *tail;
+    NodeList *head;
 public:
     List() {
-        head = NULL;
-        tail = NULL;
+        head = new NodeList ();
     }
 
     void createNode(int id) {
-        NodeList *temp = new NodeList;
-        temp->id = id;
-        temp->next = NULL;
+        NodeList *temp = new NodeList (id);
         if (head == NULL) {
             head = temp;
-            tail = temp;
+
             temp = NULL;
         } else {
-            tail->next = temp;
-            tail = temp;
+
         }
     }
 

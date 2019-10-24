@@ -1,3 +1,0 @@
-/home/gabrielnogueira/Documents/Algoritmos/c++/Lista03/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/gabrielnogueira/Documents/Algoritmos/c++/Lista03/cmake-build-debug/CMakeFiles/lista3.dir
-/home/gabrielnogueira/Documents/Algoritmos/c++/Lista03/cmake-build-debug/CMakeFiles/edit_cache.dir
