@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stdio.h>
+#include <tuple>
 
 using namespace std;
 
@@ -45,7 +47,7 @@ public:
         insert (this->head, id);
     }
 
-    int search(int id, int pos) {
+    int search(int id) {
         if ((find (head, id))->next != nullptr) {
             return 1;
         } else {
@@ -89,12 +91,32 @@ struct Node {
         this->right = nullptr;
     }
 
+    Node * getParent (Node * root, int caste) {
+        if(root == nullptr){
+            return nullptr;
+        }
+        Node * parent = nullptr;
+
+        while(root != nullptr) {
+            if(caste < root->caste){
+                parent = root;
+                root = root->left;
+            } else if (caste > root->caste){
+                parent = root;
+                root = root->right;
+            } else {
+                break;
+            }
+        }
+        return parent;
+    }
+
 };
 
 struct Tree {
-    
+
     Node *root;
-    
+
     Tree() {
         root = NULL;
     }
@@ -130,7 +152,7 @@ struct Tree {
                 return h;
             } else {
                 return -1;
-            }  
+            }
         }
     }
 
@@ -145,8 +167,14 @@ struct Tree {
             return root;
         } else {
             root->agent->deleteNode(id);
-            if (!root->agent->empty()) root;  
+            if (!root->agent->empty()) return root;
             if(root->left == nullptr && root->right == nullptr) {
+                Node * parent = root->getParent(this->root, caste);
+                if(parent->left == root){
+                    parent->left = nullptr;
+                } else {
+                    parent->right = nullptr;
+                }
                 delete root;
                 return nullptr;
             } else if(root->left == nullptr){
@@ -164,6 +192,7 @@ struct Tree {
                 delete root->agent;
                 root->agent = hijacked->agent;
                 delete hijacked;
+                return root;
             }
         }
     }
@@ -176,7 +205,7 @@ struct Tree {
             tie (root->left, tchau) = dispose (root->left);
             return make_pair (root, tchau);
         }
-    } 
+    }
 
 };
 
@@ -185,8 +214,8 @@ int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
 
-    int n = 0, h = 0, f = 0, c = 0, id = 0, b = 0, counter = 0, answerINF = 0, count = 0, i = 0, j = 0, answerSCH = 0;
-    string adm = "", answerADM = "";
+    int n = 0, h = 0, f = 0, c = 0, id = 0, b = 0, counter = 0, i = 0, answerSCH = 0;
+    string input = "", answerADM = "";
     cin >> n >> h >> f;
     Tree tree[n];
     while (input != "END") {
@@ -195,46 +224,51 @@ int main() {
             cin >> c >> id >> b;
         }
         if (input == "ADM") {
-            bool inseriu, cheio = false;
+            bool inseriu = false, cheio = false;
             tie (tree[b].root, inseriu) = tree[b].insert(tree[b].root, id, c, h);
             if (!inseriu) {
-                i = b + 1;
-                while (cheio || !inseriu) {
+                i = (b + 1) % n;
+                while (cheio == false && inseriu == false) {
                     if (!inseriu) {
-                        tie (tree[b].root, inseriu) = tree[i].insert(tree[b].root, id, c, h);
+                        tie (tree[i].root, inseriu) = tree[i].insert(tree[i].root, id, c, h);
                         counter++;
-                    } else if (counter >= n - 1) {
+                    }
+                    if (counter >= n - 1) {
                         cheio = true;
                     }
-                    i++;
+                    i = (i + 1) % n;
                 }
             }
-
+            counter = 0;
         }
         if (input == "INF") {
-            bool inseriu, cheio = false;
+            bool inseriu = false, cheio = false;
             tie (tree[b].root, inseriu) = tree[b].insert(tree[b].root, id, c, h);
             if (!inseriu) {
-                i = b + 1;
-                while (cheio || !inseriu) {
+                i = (b + 1) % n;
+                while (cheio == false && inseriu == false) {
                     if (!inseriu) {
-                        tie (tree[b].root, inseriu) = tree[i].insert(tree[b].root, id, c, h);
+                        tie (tree[i].root, inseriu) = tree[i].insert(tree[i].root, id, c, h);
                         counter++;
-                    } else if (counter >= n - 1) {
+                    }
+                    if (counter >= n - 1) {
                         cheio = true;
                     }
                     if(inseriu){
                         cout << i << endl;
                     }
-                    i++;
+                    i = (i + 1) % n;
                 }
+            } else {
+                cout << b << endl;
             }
+            counter = 0;
         }
         if (input == "EXT") {
-            tree[b].ext(tree[b].root,c, id);
+            tree[b].ext(tree[b].root, c, id);
         }
         if (input == "SCH") {
-            answerSCH = tree[b].search(tree[b].root, c, id, 1);
+            answerSCH = tree[b].search(tree[b].root, c, id, 0);
             cout << answerSCH << endl;
         }
     }
