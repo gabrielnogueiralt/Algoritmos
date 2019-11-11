@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/gabri/Documents/Code/CIn/Algoritmos/c++/Lista05/main.cpp
+iostream
+-
+vector
+-
+math.h
+-
+
