@@ -1,343 +1,412 @@
 #include <iostream>
+#include <string>
 #include <cmath>
- 
+
 using namespace std;
- 
-int maximo (int a, int b){
-    if(a > b){
-        return a;
-    }else
-        return b;
-}
- 
-int calcularChave(string placa){
-    int *p = new int[6];
-    int chave = 0;
-    for(int i = 0;i < placa.size(); i++){
-        p[i] = (int) (placa[i] - 65);
-        chave += p[i] * (pow(26,i));
-    }
-    return chave;
-}
- 
-class HashTable {
-private:
-    int mVagas, vagasOcup, vagasEfet;
-    int *vagas;
-public:
-     HashTable(int mVagas){
-        this->mVagas = mVagas;
-        this->vagasOcup = vagasOcup;
-        this->vagas = new int[mVagas];
-        this->vagasEfet = vagasOcup;
-    }
- 
-     void in(int chave, int fMax){
-        int j = 0;
-        if(100 * this->vagasOcup > fMax * this->mVagas){
-            int *aux = this->vagas;
-            this->mVagas *= 2;
-            //this->tamanho = tamanho / 2;
-            this->vagas = new int[this->mVagas];
-            for(int i = 0; i < mVagas; i++){
-                if(aux[i] != -1){
-                    int y = 0;
-                    if(this->vagas[aux[i] % this->mVagas] != 0){
-                        bool cond = true;
-                        while(cond){
-                            if(this->vagas[(aux[i]+y)% this->mVagas] != 0){
-                                y++;
-                            } else {
-                                cond = false;
-                            }
-                        }
-                    }
-                    this->vagas[(aux[i] + y) % this->mVagas] = aux[i];
-                }
-            }
-        }
-        if (this->vagas[chave % this->mVagas] != 0) {
-            bool cond = true;
-            while (cond) {
-                if (this->vagas[(chave + j) % this->mVagas] != 0) {
-                    j++;
-                } else {
-                    cond = false;
-                }
-            }
-        }
-        this->vagasOcup++;
-        this->vagas[(chave + j) % this->mVagas] = chave;
-        this->vagasEfet++;
- 
-        cout << ((chave + j) % this->mVagas);
-        cout << " " << j << " ";
-    }
- 
-    void out(int chave, int fMin, int mMin) {
-        this->procurar(chave, true, 0);
-        if (this->mVagas >= mMin && 100 * this->vagasEfet < this->mVagas * fMin) {
-            this->mVagas = maximo((this->mVagas / 2), mMin);
-            int *aux = this->vagas;
-            this->vagas = new int[this->mVagas];
-            //this.tamanho = tamanho / 2;
-            for (int i = 0; i < mVagas; i++) {
-                if (aux[i] != 0 && aux[i] != -1) {
-                    int y = 0;
-                    if (this->vagas[aux[i] % this->mVagas] != 0) {
-                        bool cond = true;
-                        while (cond) {
-                            if (this->vagas[(aux[i] + y) % this->mVagas] != 0) {
-                                y++;
-                            } else {
-                                cond = false;
-                            }
-                        }
-                    }
-                    this->vagas[(aux[i] + y) % this->mVagas] = aux[i];
-                }
-            }
-            this->vagasEfet = this->vagasOcup;
-        }
-    }
- 
-    int procurar(int chave, bool out, int dMax){
-        int i = 0;
-        if (this->vagas[chave % this->mVagas] == chave) {
-            cout << (chave % this->mVagas + " 0 ");
-            if (out == true) {
-                this->vagas[chave % this->mVagas] = -1;
-                this->vagasEfet--;
-            }
-        } else if (this->vagas[chave % this->mVagas] == 0) {
-            cout << ("-1 -1 ");
-        } else {
-            bool cond = true;
-            i = 1;
-            while (cond) {
-                if (this->vagas[(chave + i) % this->mVagas] != 0 && this->vagas[(chave + i) % this->mVagas] != chave) {
-                    i++;
-                } else if (this->vagas[(chave + i) % this->mVagas] != 0 && this->vagas[(chave + i) % this->mVagas] == chave) {
-                    cond = false;
-                    cout << ((chave + i) % this->mVagas) << endl;
-                    cout << " " << i << " ";
-                    if (out == true) {
-                        this->vagas[chave % this->mVagas] = -1;
-                        this->vagasEfet--;
-                    }
-                    if (i > dMax) {
-                        dMax = i;
-                    }
-                } else {
-                    cond = false;
-                    cout << ("-1 -1 ");
-                }
-            }
-        }
-        return dMax;
+
+struct hashNode {
+    int key;
+    string value;
+
+    hashNode(int key, string value)
+    {
+        this->key = key;
+        this->value = value;
     }
 };
- 
-class E2{
+
+class a_hashTable {
 private:
-    int mVagas, vagasOcup, vagasEfet;
-    int *vagas;
-    int *dist;
- 
+    int Mactual, Fmin, Fmax, Mmin;
+    int occupancyRate, effectiveOccupancyRate;
+    hashNode **array;
+
 public:
-    E2(int mVagas){
-        this->mVagas = mVagas;
-        this->vagasOcup = 0;
-        this->vagas = new int[mVagas];
-        this->dist = new int[mVagas];
-        this->vagasEfet = vagasOcup;
+    a_hashTable(int Mmin, int Fmin, int Fmax) {
+        this->Mmin = Mmin;
+        this->Mactual = Mmin;
+        this->Fmin = Fmin;
+        this->Fmax = Fmax;
+        this->occupancyRate = 0;
+        this->effectiveOccupancyRate = 0;
+        array = new hashNode * [Mactual];
+        for (int i = 0; i < Mactual; i++) {
+            array[i] = NULL;
+        }
     }
- 
-    void in(int chave, int fMax, int j, bool g) {
-        bool temp = false;
-        if (100 * this->vagasOcup > fMax * this->mVagas && g == false) {
-            int *aux = this->vagas;
-            int *aux2 = this->dist;
-            this->mVagas *= 2;
-            //this-> tamanho = tamanho * 2;
-            this->vagas = new int[this->mVagas];
-            this->dist = new int[this->mVagas];
-            this->vagasOcup = this->vagasEfet;
-            for (int i = 0; i < mVagas; i++) {
-                if (aux[i] != -1 && aux[i] != 0) {
-                    int y = 0;
-                    if (this->vagas[aux[i] % this->mVagas] != 0) {
-                        bool cond = true;
-                        y = 1;
-                        while (cond) {
-                            if (this->vagas[(aux[i] + y) % this->mVagas] != 0 && this->vagas[(aux[i] + y) % this->mVagas] != -1) {
-                                if (y <= this->dist[(aux[i] + y) % this->mVagas]) {
-                                    y++;
-                                } else {
-                                    int auxChave = this->vagas[(aux[i] + y) % this->mVagas];
-                                    int distancia = this->dist[(aux[i] + y) % this->mVagas];
-                                    this->vagas[(aux[i] + y) % this->mVagas] = aux[i];
-                                    this->dist[(aux[i] + y) % this->mVagas] = y;
-                                    this->in(auxChave, fMax, (distancia + 1) % this->mVagas, true);
-                                    cond = false;
-                                }
-                            } else if (this->vagas[(aux[i] + y) % this->mVagas] == -1) {
-                                y++;
-                            } else {
-                                cond = false;
-                            }
-                        }
-                    }
-                    this->vagas[(aux[i] + y) % this->mVagas] = aux[i];
-                    this->dist[(aux2[i] + y) % this->mVagas] = y;
+
+    int a_hashFunction(int key, int M) {
+        return (key % M);
+    }
+
+    pair<int, int> a_insert(int key, string value) {
+        pair<int,int> positionAndDistance;
+        if (100 * occupancyRate > Mactual * Fmax) { // Se precisar aumentar o tamanho
+            int newMactual = Mactual * 2;
+            a_rehash(newMactual);
+            Mactual *= 2;
+            return a_inserting(key, value);
+        }
+        else { // Caso não precise aumentar o tamanho
+            return a_inserting(key, value);
+        }
+    }
+
+    pair<int,int> a_inserting(int key, string value) {
+        pair<int,int> positionAndDistance;
+        positionAndDistance.first = a_hashFunction(key, Mactual);
+        positionAndDistance.second = 0; // Inicialmente a distância é 0
+        while (array[positionAndDistance.first] != NULL) { // Procura pela primeira posição vazia (NULL)
+            positionAndDistance.second++; // Aumentar a distância
+            positionAndDistance.first = a_hashFunction(key + positionAndDistance.second, Mactual); // Anda um para hash Function
+        }
+        array[positionAndDistance.first] = new hashNode(key, value); // Na posição que estava NULL, cria-se um novo node
+        occupancyRate++; // Aumenta o valor de ocupação
+        effectiveOccupancyRate++; // Aumenta a ocupação efetiva
+        return positionAndDistance;
+    }
+
+    void a_rehash(int newMactual) {
+        occupancyRate = 0;
+        effectiveOccupancyRate = 0;
+        hashNode **tempArray = new hashNode * [newMactual]; // Cria um array de nós temporário com o dobro ou metade do tamanho original
+        for (int i = 0; i < Mactual; i++) {
+            if (array[i] != NULL && array[i]->key != -1) { // Selecionar somente os arrays não nulos e que o key seja diferente de -1 (indisponível)
+                int h = a_hashFunction(array[i]->key, newMactual); // Calcula a função de acordo com a key e com a nova capacidade
+                while (tempArray[h] != NULL) { // Procura uma posição não nula a partir de h
+                    h++;
+                    h = a_hashFunction(h, newMactual);
+                }
+                tempArray[h] = array[i];
+                occupancyRate++;
+                effectiveOccupancyRate++;
+            }
+        }
+        array = tempArray;
+    }
+
+    pair<int, int> a_remove(int key) {
+        pair<int,int> positionAndDistance;
+        positionAndDistance = a_search(key);
+        if (positionAndDistance.first >= 0) {
+            array[positionAndDistance.first]->key = -1;
+            effectiveOccupancyRate--;
+            if (100 * effectiveOccupancyRate < Mactual * Fmin && Mactual/2 >= Mmin) {
+                int newMactual = Mactual / 2;
+                a_rehash(newMactual);
+                Mactual = Mactual / 2;
+            }
+        }
+        return positionAndDistance;
+    }
+
+    pair<int, int> a_search(int key) {
+        pair<int,int> positionAndDistance;
+        positionAndDistance.first = a_hashFunction(key, Mactual);
+        positionAndDistance.second = 0;
+        bool found = false;
+        while (array[positionAndDistance.first] != NULL && !found) {
+            if (array[positionAndDistance.first]->key == key) {
+                if (array[positionAndDistance.first]->key > 0) {
+                    return positionAndDistance;
+                } else {
+                    found = true;
+                }
+            } else {
+                positionAndDistance.second++;
+                positionAndDistance.first = a_hashFunction(key + positionAndDistance.second, Mactual);
+            }
+        }
+        positionAndDistance.first = -1;
+        positionAndDistance.second = -1;
+        return positionAndDistance;
+    }
+
+};
+
+class b_hashTable {
+private:
+    int Mactual, Fmin, Fmax, Mmin;
+    int occupancyRate, effectiveOccupancyRate;
+    hashNode **array;
+
+public:
+    b_hashTable(int Mmin, int Fmin, int Fmax) {
+        this->Mmin = Mmin;
+        this->Mactual = Mmin;
+        this->Fmin = Fmin;
+        this->Fmax = Fmax;
+        this->occupancyRate = 0;
+        this->effectiveOccupancyRate = 0;
+        array = new hashNode *[Mactual];
+        for (int i = 0; i < Mactual; i++) {
+            array[i] = NULL;
+        }
+    }
+
+    int b_hashFunction(int key, int M) {
+        if (key >= 0) {
+            return (key % M);
+        } else {
+            return (key + M) % M;
+        }
+    }
+
+    pair<int, int> b_insert(int key, string value) {
+        pair<int, int> positionAndDistance;
+        if (100 * occupancyRate > Mactual * Fmax) {
+            //cout << "precisei dar rehash" << endl;
+            int newMactual = Mactual * 2;
+            b_rehash(newMactual);
+            Mactual *= 2;
+            return b_inserting(key, value);
+        } else {
+            return b_inserting(key, value);
+        }
+    }
+
+    pair<int, int> b_inserting(int key, string value) {
+        pair<int, int> positionAndDistance, auxPositionAndDistance;
+        positionAndDistance.first = b_hashFunction(key, Mactual);
+        positionAndDistance.second = 0;
+        bool isItFirst = true;
+        while (array[positionAndDistance.first] != NULL) {
+            int elementDistance = b_hashFunction(
+                    positionAndDistance.first - ((array[positionAndDistance.first]->key) % Mactual),
+                    Mactual);
+            if (array[positionAndDistance.first]->key == -1 || elementDistance >= positionAndDistance.second) {
+                positionAndDistance.second++;
+                positionAndDistance.first = b_hashFunction(key + positionAndDistance.second, Mactual);
+            } else {
+                hashNode *tempNode = new hashNode(array[positionAndDistance.first]->key,
+                                                  array[positionAndDistance.first]->value);
+                array[positionAndDistance.first]->key = key;
+                array[positionAndDistance.first]->value = value;
+                key = tempNode->key;
+                value = tempNode->value;
+                if (isItFirst) {
+                    auxPositionAndDistance.first = positionAndDistance.first;
+                    auxPositionAndDistance.second = positionAndDistance.second;
+                    elementDistance++;
+                    positionAndDistance.second = elementDistance;
+                    positionAndDistance.first = b_hashFunction(key + positionAndDistance.second, Mactual);
+                    isItFirst = false;
+                } else {
+                    elementDistance++;
+                    positionAndDistance.second = elementDistance;
+                    positionAndDistance.first = b_hashFunction(key + positionAndDistance.second, Mactual);
                 }
             }
         }
-        if (j == -5) {
-            temp = true;
-            j = 0;
-            this->vagasOcup++;
+        array[positionAndDistance.first] = new hashNode(key, value);
+        occupancyRate++;
+        effectiveOccupancyRate++;
+        if (isItFirst) {
+            return positionAndDistance;
+        } else {
+            return auxPositionAndDistance;
         }
-        if (this->vagas[(chave + j) % this->mVagas] != 0) {
-            bool cond = true;
-            while (cond) {
-                if (this->vagas[(chave + j) % this->mVagas] != 0 && this->vagas[(chave + j) % this->mVagas] != -1) {
-                    if (j <= this->dist[(chave + j) % this->mVagas]) {
-                        j++;
+    }
+
+    void b_rehash(int newMactual) {
+        occupancyRate = 0; effectiveOccupancyRate = 0;
+        hashNode **tempArray = new hashNode *[newMactual];
+        for (int i = 0; i < Mactual; i++) {
+            if (array[i] != NULL && array[i]->key != -1){
+                int h = b_hashFunction(array[i]->key, newMactual);
+                int distance = 0;
+                while (tempArray[h] != NULL ) {
+                    int elementDistance = b_hashFunction((h - b_hashFunction(tempArray[h]->key,newMactual)), newMactual);
+                    if (elementDistance >= distance) {
+                        distance++;
+                        h = b_hashFunction(array[i]->key + distance, newMactual);
                     } else {
-                        int aux = this->vagas[(chave + j) % this->mVagas];
-                        int distancia = this->dist[(chave + j) % this->mVagas];
-                        this->vagas[(chave + j) % this->mVagas] = chave;
-                        this->dist[(chave + j) % this->mVagas] = j;
-                        this->in(aux, fMax, distancia % this->mVagas, true);
-                        cond = false;
+                        hashNode *tempNode = new hashNode(tempArray[h]->key, tempArray[h]->value);
+                        tempArray[h] = array[i];
+                        distance = elementDistance + 1;
+                        array[i] = tempNode;
+                        h = b_hashFunction(array[i]->key + distance, newMactual);
                     }
-                } else if (this->vagas[(chave + j) % this->mVagas] == -1) {
-                    j++;
-                } else {
-                    this->vagas[(chave + j) % this->mVagas] = chave;
-                    this->dist[(chave + j) % this->mVagas] = j;
-                    cond = false;
                 }
+                tempArray[h] = array[i];
+                occupancyRate++; effectiveOccupancyRate++;
             }
-        } else {
-            this->vagas[(chave + j) % this->mVagas] = chave;
-            this->dist[(chave + j) % this->mVagas] = j;
         }
-        if (temp) {
-            cout << ((chave + j) % this->mVagas);
-            cout << " " << j;
-            this->vagasEfet++;
-        }
+        array = tempArray;
     }
- 
-    void out(int chave, int fMin, int mMin, int fMax) {
-        this->procurar(chave, true, 0);
-        if (this->mVagas > mMin && 100 * this->vagasEfet < this->mVagas * fMin) {
-            this->mVagas = this->mVagas / 2;
-            //this->tamanho = tamanho / 2;
-            int *aux = this->vagas;
-            int *aux2 = this->dist;
-            this->vagas = new int[this->mVagas];
-            this->dist = new int[this->mVagas];
-            for (int i = 0; i < mVagas; i++) {
-                if (aux[i] != 0 && aux[i] != -1) {
-                    int y = 0;
-                    if (this->vagas[aux[i] % this->mVagas] != 0) {
-                        bool cond = true;
-                        y = 1;
-                        while (cond) {
-                            if (this->vagas[(aux[i] + y) % this->mVagas] != 0 && this->vagas[(aux[i] + y) % this->mVagas] != -1) {
-                                if (y <= this->dist[(aux[i] + y) % this->mVagas]) {
-                                    y++;
-                                } else {
-                                    int auxChave = this->vagas[(aux[i] + y) % this->mVagas];
-                                    int distancia = this->dist[(aux[i] + y) % this->mVagas];
-                                    this->vagas[(aux[i] + y) % this->mVagas] = aux[i];
-                                    this->dist[(aux[i] + y) % this->mVagas] = y;
-                                    this->in(auxChave, fMax, distancia % this->mVagas, true);
-                                    cond = false;
-                                }
-                            } else if (this->vagas[(aux[i] + y) % this->mVagas] == -1) {
-                                y++;
-                            } else {
-                                cond = false;
-                            }
-                        }
-                    }
-                    this->vagas[(aux[i] + y) % this->mVagas] = aux[i];
-                    this->dist[(aux2[i] + y) % this->mVagas] = y;
-                }
+
+    pair<int, int> b_remove(int key) {
+        pair<int,int> positionAndDistance;
+        positionAndDistance = b_search(key);
+        if (positionAndDistance.first >= 0) {
+            array[positionAndDistance.first]->key = -1;
+            effectiveOccupancyRate--;
+            if (100 * effectiveOccupancyRate < Mactual * Fmin && Mactual/2 >= Mmin) {
+                int newMactual = Mactual / 2;
+                b_rehash(newMactual);
+                Mactual = Mactual / 2;
             }
-            this->vagasOcup = this->vagasEfet;
         }
+        return positionAndDistance;
     }
- 
-    int procurar(int chave, bool out, int dMax) {
-        int i = 0;
-        if (this->vagas[chave % this->mVagas] == chave) {
-            cout << (chave % this->mVagas + " 0") << endl;
-            if (out == true) {
-                this->vagas[chave % this->mVagas] = -1;
-                this->vagasEfet--;
-            }
-        } else if (this->vagas[chave % this->mVagas] == 0) {
-            cout << ("-1 -1") << endl;
-        } else {
-            bool cond = true;
-            i = 1;
-            while (cond) {
-                if (this->vagas[(chave + i) % this->mVagas] == -1) {
-                    i++;
-                } else if (this->vagas[(chave + i) % this->mVagas] != -1 && this->vagas[(chave + i) % this->mVagas] != 0 && this->vagas[(chave + i) % this->mVagas] != chave && this->dist[(chave + i) % this->mVagas] >= i) {
-                    i++;
-                } else if (this->vagas[(chave + i) % this->mVagas] == chave) {
-                    cout << ((chave + i) % this->mVagas);
-                    cout << (" " + i) << endl;
-                    if (out == true) {
-                        this->vagas[chave % this->mVagas] = -1;
-                        this->vagasEfet--;
-                    }
-                    if (i > dMax) {
-                        dMax = i;
-                    }
-                    cond = false;
-                } else if (this->vagas[(chave + i) % this->mVagas] != -1 && this->vagas[(chave + i) % this->mVagas] != 0 && this->vagas[(chave + i) % this->mVagas] != chave && this->dist[(chave + i) % this->mVagas] < i) {
-                    cout << ("-1 -1") << endl;
-                    cond = false;
+
+    pair<int, int> b_search(int key) {
+        pair<int, int> positionAndDistance;
+        positionAndDistance.first = b_hashFunction(key, Mactual);
+        positionAndDistance.second = 0;
+        bool found = false;
+        while (array[positionAndDistance.first] != NULL && !found) {
+            if (array[positionAndDistance.first]->key == key) {
+                if (array[positionAndDistance.first]->key > 0) {
+                    return positionAndDistance;
                 } else {
-                    cond = false;
-                    cout << ("-1 -1") << endl;
+                    found = true;
                 }
+            } else {
+                int elementDistance;
+                elementDistance = b_hashFunction(
+                        positionAndDistance.first - ((array[positionAndDistance.first]->key) % Mactual), Mactual);
+
+                positionAndDistance.second++;
+                positionAndDistance.first = b_hashFunction(key + positionAndDistance.second, Mactual);
+
             }
         }
-        return dMax;
+        positionAndDistance.first = -1;
+        positionAndDistance.second = -1;
+        return positionAndDistance;
     }
 };
- 
-int main(){
-    int mMin, fMin, fMax, maior = 0, maior2 = 0;
-    cin >> mMin >> fMin >> fMax;
-    HashTable table(mMin);
-    E2 e2(mMin);
-    string entrada = "", placa = "";
-    while(entrada != "END"){
-      cin >> entrada;
-      if(entrada != "END"){
+
+
+int placaToKey(string placa);
+
+int main() {
+    int Mmin, Fmin, Fmax;
+    cin >> Mmin; cin >> Fmin; cin >> Fmax;
+    a_hashTable *teste = new a_hashTable(Mmin, Fmin, Fmax);
+    b_hashTable *secondHash = new b_hashTable(Mmin, Fmin, Fmax);
+    string operation; string placa;
+    int a_sch = 0; int b_sch = 0;
+    cin >> operation;
+    int cont=0;
+    while (operation != "END") {
         cin >> placa;
-        int chave = calcularChave(placa);
-        if(entrada == "IN"){
-            table.in(chave, fMax);
-            e2.in(chave, fMax, -5, false);
-        } else if(entrada == "OUT"){
-            table.out(chave, fMin, mMin);
-        } else {
-            maior = table.procurar(chave, false, maior);
-            maior2 = e2.procurar(chave, false, maior2);
+        cont++;
+        if (operation == "IN") {
+            int key = placaToKey(placa);
+            pair<int, int> testando = teste->a_insert(key, placa);
+            pair<int, int> second = secondHash->b_insert(key, placa);
+            cout << testando.first << " " << testando.second << " " << second.first << " " << second.second << endl;
+            cin >> operation;
+        } else if (operation == "OUT") {
+            int key = placaToKey(placa);
+            pair<int,int> out = teste->a_remove(key);
+            pair<int, int> second = secondHash->b_remove(key);
+            cout << out.first << " " << out.second << " " << second.first << " " << second.second << endl;
+            cin >> operation;
         }
-      }
+        else {
+            int key = placaToKey(placa);
+            pair<int,int> search = teste->a_search(key);
+            pair<int, int> second = secondHash->b_search(key);
+            cout << search.first << " " << search.second << " " << second.first << " " << second.second << endl;
+            cin >> operation;
+            if (search.second > a_sch) {
+                a_sch = search.second;
+            }
+            if (second.second > b_sch) {
+                b_sch = second.second;
+            }
+        }
     }
-    cout << maior << " " << maior2;
- 
+    cout << a_sch << " " << b_sch << endl;
     return 0;
+}
+
+
+int placaToKey(string placa) {
+    int key = 0;
+    for (int i = 0; i < 6; i ++){
+        switch (placa[i]){
+            case 'A':
+                break;
+            case 'B':
+                key += pow(26, i);
+                break;
+            case 'C':
+                key += 2*pow(26, i);
+                break;
+            case 'D':
+                key += 3*pow(26, i);
+                break;
+            case 'E':
+                key += 4*pow(26, i);
+                break;
+            case 'F':
+                key += 5*pow(26, i);
+                break;
+            case 'G':
+                key += 6*pow(26, i);
+                break;
+            case 'H':
+                key += 7*pow(26, i);
+                break;
+            case 'I':
+                key += 8*pow(26, i);
+                break;
+            case 'J':
+                key += 9*pow(26, i);
+                break;
+            case 'K':
+                key += 10*pow(26, i);
+                break;
+            case 'L':
+                key += 11*pow(26, i);
+                break;
+            case 'M':
+                key += 12*pow(26, i);
+                break;
+            case 'N':
+                key += 13*pow(26, i);
+                break;
+            case 'O':
+                key += 14*pow(26, i);
+                break;
+            case 'P':
+                key += 15*pow(26, i);
+                break;
+            case 'Q':
+                key += 16*pow(26, i);
+                break;
+            case 'R':
+                key += 17*pow(26, i);
+                break;
+            case 'S':
+                key += 18*pow(26, i);
+                break;
+            case 'T':
+                key += 19*pow(26, i);
+                break;
+            case 'U':
+                key += 20*pow(26, i);
+                break;
+            case 'V':
+                key += 21*pow(26, i);
+                break;
+            case 'W':
+                key += 22*pow(26, i);
+                break;
+            case 'X':
+                key += 23*pow(26, i);
+                break;
+            case 'Y':
+                key += 24*pow(26, i);
+                break;
+            case 'Z':
+                key += 25*pow(26, i);
+                break;
+        }
+    }
+    return key;
 }
