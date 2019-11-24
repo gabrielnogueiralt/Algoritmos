@@ -9,7 +9,7 @@ struct No {
     int origem, para, proximo, w;
 }
 
-aux[5151111];
+        aux[5151111];
 
 int n , m, it;
 int head[150000];
@@ -46,7 +46,7 @@ void planets() {
 
     queue<int>s;
     memset(v, 0, sizeof(v));
-    for(int i = 1; i <= n; i++){  
+    for(int i = 1; i <= n; i++){
         distancia[i]=0x3f3f3f3f;
     }
     distancia[1] = procurar(1,0);
@@ -60,7 +60,7 @@ void planets() {
             int w = aux[i].w;
             int y = distancia[u] + w;
             if(z!=n){
-                y = procurar(v , y);
+                y = procurar(z,y);
             }
             if(distancia[z]>y) {
                 distancia[z]=y;
@@ -71,17 +71,17 @@ void planets() {
             }
         }
     }
-    if(distancia[n] == 0x3f3f3f3f) 
-        cout << -1 << endl; 
+    if(distancia[n] == 0x3f3f3f3f)
+        cout << -1 << endl;
     else
-        cout << distancia[n] << endl; 
+        cout << distancia[n] << endl;
 }
 
 int main() {
-    while(cin >> n >> m)) {
+    while(cin >> n >> m) {
         it=0;
         memset(head,-1,sizeof(head));
-        for(int i=1;i<=n;i++) { 
+        for(int i=1;i<=n;i++) {
             vec1[i].clear(),vec2[i].clear();
         }
         for(int i=1;i<=m;i++) {
