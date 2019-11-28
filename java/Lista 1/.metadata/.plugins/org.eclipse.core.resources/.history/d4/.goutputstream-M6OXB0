@@ -1,0 +1,90 @@
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in);
+		int m = in.nextInt();
+		String comando, expressao, temp = "", x = "", y = "";
+		Pilha pilha = new Pilha();
+		
+		for(int i = 0; i < m; i++) {
+			comando = in.next();
+			if (comando.equals("VAL")) {
+				expressao = in.next();
+				for(int j = 0; j < expressao.length();j++) {
+					if(expressao.charAt(j) == '0' || expressao.charAt(j) == '1') {
+						temp = Character.toString(expressao.charAt(j));
+						pilha.empilhar(temp);
+					} else if (expressao.charAt(j) == '~') {
+						temp = pilha.desempilhar();
+						if(temp.equals("0")) {
+							temp = "1";
+						} else {
+							temp = "0";
+						}
+						pilha.empilhar(temp);
+						
+					} else if (expressao.charAt(j) == '^') {
+						x = pilha.desempilhar();
+						y = pilha.desempilhar();
+						if (x.equals("1") && y.equals("1")){
+							pilha.empilhar("1");
+						} else {
+							pilha.empilhar("0");
+						}
+					} else if (expressao.charAt(j) == 'v') {
+						
+					} else if (expressao.charAt(j) == '>') {
+						
+					}
+				}
+				
+			} else {
+				expressao = in.next();
+			}
+		}
+	}
+
+}
+class Pilha {
+	public String[] stack;
+	public int size;
+	
+	public Pilha() {
+		this.size = 0;
+		this.stack = new String[100];
+	}
+	
+	public String peek() {  
+		if(isEmpty())  
+			return null;  
+		 
+		return this.stack[getTopPosition()];  
+	}
+	
+	private int getTopPosition() {
+		if (isEmpty())
+			return 0;
+		return this.size - 1;  
+	}
+	
+	public boolean isEmpty() {
+		return this.size <= 0;
+	}
+	
+	public String pop() {
+		String result = peek();  
+
+		if(result != null) {  
+			stack[getTopPosition()] = null;  
+			this.size--;  
+		}  
+		return result;
+	}
+	
+	public void push(String value) {  
+		this.size++;  
+		this.stack[getTopPosition()] = value;    
+	}  
+}
